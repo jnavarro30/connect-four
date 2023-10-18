@@ -1,4 +1,4 @@
-const squares = document.querySelectorAll(".grid div");
+const gridEl = document.getElementsByClassName("grid")[0];
 const result = document.querySelector("#result");
 const displayCurrentPlayer = document.querySelector("#current-player");
 let currentPlayer = 1;
@@ -75,28 +75,31 @@ const winningArrays = [
   [13, 20, 27, 34],
 ];
 
+(function createBoard() {
+  for (let i = 0; i < 49; i++) {
+    const squareEl = document.createElement("div");
+    if (i >= 42) squareEl.classList.add("taken");
+    gridEl.append(squareEl);
+  }
+})();
+
+const squares = document.querySelectorAll(".grid div");
+
 function checkBoard() {
   for (let y = 0; y < winningArrays.length; y++) {
     const square1 = squares[winningArrays[y][0]];
     const square2 = squares[winningArrays[y][1]];
     const square3 = squares[winningArrays[y][2]];
     const square4 = squares[winningArrays[y][3]];
+    const connectFour = [square1, square2, square3, square4];
 
-    //check those squares to see if they all have the class of player-one
+    //check those squares to see if they all have the same player class
     if (
-      square1.classList.contains("player-one") &&
-      square2.classList.contains("player-one") &&
-      square3.classList.contains("player-one") &&
-      square4.classList.contains("player-one")
+      connectFour.every((square) => square.classList.contains("player-one"))
     ) {
       result.innerHTML = "Player One Wins!";
-    }
-    //check those squares to see if they all have the class of player-two
-    if (
-      square1.classList.contains("player-two") &&
-      square2.classList.contains("player-two") &&
-      square3.classList.contains("player-two") &&
-      square4.classList.contains("player-two")
+    } else if (
+      connectFour.every((square) => square.classList.contains("player-two"))
     ) {
       result.innerHTML = "Player Two Wins!";
     }
@@ -111,17 +114,18 @@ for (let i = 0; i < squares.length; i++) {
       !squares[i].classList.contains("taken")
     ) {
       if (currentPlayer == 1) {
-        squares[i].classList.add("taken");
         squares[i].classList.add("player-one");
         currentPlayer = 2;
-        displayCurrentPlayer.innerHTML = currentPlayer;
       } else if (currentPlayer == 2) {
-        squares[i].classList.add("taken");
         squares[i].classList.add("player-two");
         currentPlayer = 1;
-        displayCurrentPlayer.innerHTML = currentPlayer;
       }
-    } else alert("cant go here");
+    } else {
+      alert("cant go here");
+      return;
+    }
+    squares[i].classList.add("taken");
+    displayCurrentPlayer.innerHTML = currentPlayer;
     checkBoard();
   };
 }
